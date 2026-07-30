@@ -1,4 +1,3 @@
-
 import random
 import os
 import time as tm
@@ -8,13 +7,24 @@ rm = random
 # Moneda del sistema (comienzas con 1 al prender el OS)
 ascoins = 1.0
 secret_unlocked = False
+bono_secreto_activo = False
 
 def check_unlock():
-    global secret_unlocked, ascoins
+    global secret_unlocked, ascoins, bono_secreto_activo
     # umbral reducido a 30 ascoins
     if not secret_unlocked and ascoins >= 30:
         secret_unlocked = True
-        print("¡Has desbloqueado una función secreta! Revisa la opción 'Función secreta' en el menú.")
+        bono_secreto_activo = True
+        print("¡Has desbloqueado el Bono Secreto! Cada victoria futura te dará +3 ascoins extra.")
+
+
+def otorgar_recompensa(base_reward):
+    global ascoins, bono_secreto_activo
+    ascoins += base_reward
+    if bono_secreto_activo:
+        ascoins += 3
+        print("Bono secreto activado: +3 ascoins extra.")
+    print(f"Has ganado {base_reward + (3 if bono_secreto_activo else 0)} ascoins. Saldo: {ascoins}")
 
 def initial():
     print("hola bienvenido a ay que asco OS")
@@ -72,11 +82,8 @@ def jugar_adivinanza():
             print("Muy alto. Intenta otra vez.")
         else:
             print(f"¡Correcto! Adivinaste el número en {intentos} intentos.")
-            # Recompensa
-            global ascoins
-            ascoins += 5
-            print(f"Has ganado 5 ascoins. Saldo: {ascoins}")
             try:
+                otorgar_recompensa(5)
                 check_unlock()
             except Exception:
                 pass
@@ -107,10 +114,8 @@ def jugar_cachipun():
              (eleccion == "papel" and oponente == "piedra") or \
              (eleccion == "tijera" and oponente == "papel"):
             print("¡Ganaste!")
-            global ascoins
-            ascoins += 2
-            print(f"Has ganado 2 ascoins. Saldo: {ascoins}")
             try:
+                otorgar_recompensa(2)
                 check_unlock()
             except Exception:
                 pass
@@ -161,10 +166,8 @@ def jugar_ahorcado():
         else:
             if entrada == palabra:
                 print("¡Correcto! Has adivinado la palabra:", palabra)
-                global ascoins
-                ascoins += 10
-                print(f"Has ganado 10 ascoins. Saldo: {ascoins}")
                 try:
+                    otorgar_recompensa(10)
                     check_unlock()
                 except Exception:
                     pass
@@ -331,9 +334,8 @@ def jugar_gatutu():
         if personas <= 0 or (personas > 0 and infectados >= personas):
             personas = 0
             # Recompensa por victoria
-            global ascoins
-            ascoins += 20
             try:
+                otorgar_recompensa(20)
                 check_unlock()
             except Exception:
                 pass
@@ -465,6 +467,9 @@ def jugar_carreras_gatos():
     if ganador == apuesta_idx:
         # Ganancia simple: recuperas la apuesta y ganas la misma cantidad
         ascoins += bet
+        if bono_secreto_activo:
+            ascoins += 3
+            print("Bono secreto activado: +3 ascoins extra.")
         print("¡Felicidades, ganaste la apuesta!")
         try:
             check_unlock()
