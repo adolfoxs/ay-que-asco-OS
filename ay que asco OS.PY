@@ -9,6 +9,8 @@ rm = random
 ascoins = 5
 secret_unlocked = False
 bono_secreto_activo = False
+failed_attempts = 0
+lockout_count = 0
 
 def check_unlock():
     global secret_unlocked, ascoins, bono_secreto_activo
@@ -28,6 +30,7 @@ def otorgar_recompensa(base_reward):
     print(f"Has ganado {base_reward + (3 if bono_secreto_activo else 0)} ascoins. Saldo: {ascoins}")
 
 def initial(intentos_fallidos=0):
+    global failed_attempts, lockout_count
     print("hola bienvenido a ay que asco OS")
     print("porfavor ingrese su su contraseña para continuar o escriba 'apagar' para apagar ay que asco OS")
     contraseña = "ay que asco"
@@ -35,34 +38,64 @@ def initial(intentos_fallidos=0):
     if contraseña_ingresada.strip().lower() == "apagar":
         print("apagando ay que asco OS")
         sys.exit()
+
     # Comprobar contraseña principal o contraseña especial para GatutusOS
     if contraseña_ingresada == contraseña:
         print("contraseña correcta")
         print("bienvenido a ay que asco OS")
+        # Reiniciar contador de fallos al ingresar correctamente
+        failed_attempts = 0
         return menu()
+
     if contraseña_ingresada.strip().lower() == "ay que gatutus":
         print("Abriendo GatutusOS...")
         tm.sleep(0.5)
         jugar_gatutus_os()
         # Volver al inicio de sesión
         return initial()
-    else:
-        print("contraseña incorrecta")
-        intentos_fallidos += 1
-        print(f"Intentos fallidos: {intentos_fallidos}/3")
-        
-        if intentos_fallidos >= 3:
+
+    # Contraseña incorrecta
+    print("contraseña incorrecta")
+    failed_attempts += 1
+    print(f"Intentos fallidos: {failed_attempts}/3")
+
+    # Si se alcanzan 3 intentos fallidos
+    if failed_attempts >= 3:
+        # Primera vez: bloqueo temporal con contador
+        if lockout_count == 0:
+            wait = 30
             print("\n" + "="*50)
             print("¡MUCHOS INTENTOS FALLIDOS!")
-            print("Se requiere reinicio manual del sistema.")
+            print(f"porfavor espere {wait} segundos para intentar de nuevo.")
+            print("Se mostrará un contador mientras espera."
+                  " El terminal se limpiará a medida que avanza.")
+            print("="*50)
+            for sec in range(wait, -1, -1):
+                try:
+                    os.system('cls' if os.name == 'nt' else 'clear')
+                except Exception:
+                    pass
+                print("\n" + "="*50)
+                print("¡MUCHOS INTENTOS FALLIDOS!")
+                print(f"Espera: {sec} segundos para reintentar.")
+                print("="*50)
+                if sec > 0:
+                    tm.sleep(1)
+            # Bloqueo temporal cumplido: resetear intentos y marcar que ya hubo un bloqueo
+            failed_attempts = 0
+            lockout_count += 1
+            # Volver a pedir contraseña
+            return initial()
+        else:
+            # Si ya hubo un bloqueo y vuelve a fallar: requiere reinicio manual y apagar
+            print("\n" + "="*50)
+            print("Se requiere reinicio manual para desbloquear el sistema.")
             print("Apagando ay que asco OS...")
             print("="*50)
-            tm.sleep(2)
             sys.exit()
-        
-        print("reiniciando ay que asco OS")
-        return initial(intentos_fallidos)
-
+    else:
+        # Si no se llegó al umbral, intentar de nuevo inmediatamente
+        return initial()
 
 def jugar_adivinanza():
     numero_secreto = random.randint(1, 20)
