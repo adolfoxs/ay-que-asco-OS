@@ -5,8 +5,8 @@ import time as tm
 import sys
 # alias para el código provisto
 rm = random
-# Moneda del sistema (comienzas con 1 al prender el OS)
-ascoins = 1.0
+# Moneda del sistema (comienzas con 5 ascoins al prender el OS)
+ascoins = 5
 secret_unlocked = False
 bono_secreto_activo = False
 
