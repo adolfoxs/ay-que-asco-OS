@@ -27,7 +27,7 @@ def otorgar_recompensa(base_reward):
         print("Bono secreto activado: +3 ascoins extra.")
     print(f"Has ganado {base_reward + (3 if bono_secreto_activo else 0)} ascoins. Saldo: {ascoins}")
 
-def initial():
+def initial(intentos_fallidos=0):
     print("hola bienvenido a ay que asco OS")
     print("porfavor ingrese su su contraseña para continuar o escriba 'apagar' para apagar ay que asco OS")
     contraseña = "ay que asco"
@@ -48,8 +48,20 @@ def initial():
         return initial()
     else:
         print("contraseña incorrecta")
+        intentos_fallidos += 1
+        print(f"Intentos fallidos: {intentos_fallidos}/3")
+        
+        if intentos_fallidos >= 3:
+            print("\n" + "="*50)
+            print("¡MUCHOS INTENTOS FALLIDOS!")
+            print("Se requiere reinicio manual del sistema.")
+            print("Apagando ay que asco OS...")
+            print("="*50)
+            tm.sleep(2)
+            sys.exit()
+        
         print("reiniciando ay que asco OS")
-        return initial()
+        return initial(intentos_fallidos)
 
 
 def jugar_adivinanza():
