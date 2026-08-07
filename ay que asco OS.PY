@@ -132,6 +132,7 @@ def jugar_adivinanza():
 
 
 def jugar_cachipun():
+    global ascoins
     opciones = ["piedra", "papel", "tijera"]
     print("Juego: Piedra, Papel o Tijera. Escribe 'salir' para volver al menú.")
     def normalizar(s):
@@ -172,6 +173,7 @@ def jugar_cachipun():
                 pass
 
 def jugar_ahorcado():
+    global ascoins
     palabras = ["gato", "perro", "python", "programa", "computadora", "raton", "teclado", "pantalla", "desarrollo", "juego"]
     palabra = rm.choice(palabras).lower()
     letras_adivinadas = set()
